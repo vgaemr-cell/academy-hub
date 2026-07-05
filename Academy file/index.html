@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>أكاديمية الجيل الجديد | C. Hammam</title>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background-color: #0f172a; 
+            color: #f8fafc; 
+            margin: 0; 
+            padding: 20px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+        }
+        .header { text-align: center; margin-bottom: 30px; border-bottom: 1px solid #334155; padding-bottom: 15px; width: 100%; max-width: 600px; }
+        .header h1 { color: #f97316; margin: 0 0 5px 0; font-size: 1.8rem; }
+        .header p { color: #cbd5e1; font-style: italic; font-size: 1rem; margin: 0; }
+        
+        .container { width: 100%; max-width: 600px; }
+
+        /* صندوق التحدي القادم - تشويق عالي 🔥 */
+        .upcoming-challenge-box { 
+            background: linear-gradient(135deg, #1e1b4b, #311042); 
+            border: 2px solid #f97316; 
+            border-radius: 15px; 
+            padding: 25px; 
+            margin-bottom: 25px; 
+            text-align: center;
+            box-shadow: 0 0 20px rgba(249, 115, 22, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+        .upcoming-title { background: #f97316; color: white; padding: 4px 15px; font-size: 0.85rem; font-weight: bold; border-radius: 20px; display: inline-block; margin-bottom: 15px; letter-spacing: 1px; animation: pulse 1.5s infinite; }
+        .vs-container { display: flex; justify-content: space-around; align-items: center; margin: 15px 0; }
+        .p-name { font-size: 1.4rem; font-weight: bold; color: #ffffff; }
+        .vs-circle { background: #f97316; color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.1rem; box-shadow: 0 0 10px #f97316; }
+        .bet-points { color: #a3e635; font-size: 1.1rem; font-weight: bold; margin-top: 10px; display: block; }
+
+        /* التحديات السابقة */
+        .past-challenges-box { background: #1e293b; border: 1px solid #334155; border-radius: 15px; padding: 20px; margin-bottom: 25px; }
+        .past-row { background: #0f172a; padding: 12px; border-radius: 8px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; border-right: 4px solid #22c55e; }
+        .winner-tag { color: #4ade80; font-size: 0.85rem; font-weight: bold; background: rgba(34, 197, 94, 0.15); padding: 2px 8px; border-radius: 4px; }
+
+        /* لوحة الصدارة والتسجيل */
+        .leaderboard { background: rgba(30, 41, 59, 0.6); backdrop-filter: blur(10px); border-radius: 15px; padding: 20px; margin-bottom: 25px; border: 1px solid #334155; }
+        .section-title { color: #f97316; text-align: center; margin-bottom: 15px; font-size: 1.2rem; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .rank-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; margin-bottom: 8px; border-radius: 8px; background-color: #1e293b; font-weight: bold; }
+        .rank-1 { background: linear-gradient(90deg, rgba(249,115,22,0.15) 0%, rgba(30,41,59,1) 100%); border-right: 4px solid #f97316; color: #f97316; }
+        .player-info { display: flex; align-items: center; gap: 10px; }
+        .avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid #475569; background-color: #334155; }
+        
+        .login-box { text-align: center; background: #1e293b; border: 1px solid #334155; border-radius: 15px; padding: 20px; margin-bottom: 20px; }
+        .input-code { background-color: #0f172a; border: 1px solid #475569; color: white; padding: 12px; font-size: 1.1rem; border-radius: 8px; width: 80%; text-align: center; margin-bottom: 15px; outline: none; }
+        .btn { background-color: #f97316; color: white; padding: 12px; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; width: 85%; font-size: 1rem; }
+
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>C. Hammam Al-Amri</h1>
+        <p>"الموهبة تمنحك الفرصة.. لكن المجهود هو من يصنع الفارق."</p>
+    </div>
+
+    <div class="container">
+        <div id="upcomingChallengeSection"></div>
+
+        <div class="past-challenges-box">
+            <div class="section-title">🏆 سجل التحديات السابقة والنتائج</div>
+            <div id="pastChallengesList"></div>
+        </div>
+
+        <div class="leaderboard">
+            <div class="section-title">📊 صدارة النخبة (Top 5)</div>
+            <div id="leaderboardList"></div>
+        </div>
+
+        <div class="login-box">
+            <h4 style="margin: 0 0 15px 0; color: #cbd5e1;">بوابة اللاعبين</h4>
+            <input type="text" id="codeInput" class="input-code" placeholder="أدخل كودك السري (HA-XXXX)">
+            <button class="btn" onclick="loginPlayer()">دخول الملف الشخصي 🔓</button>
+        </div>
+    </div>
+
+    <script>
+        // جلب البيانات الأساسية والتحديات
+        let playersDB = JSON.parse(localStorage.getItem("academyDB")) || {};
+        let challenges = JSON.parse(localStorage.getItem("academyChallenges")) || [];
+
+        // 1. معالجة وعرض التحدي القادم والقديم
+        function renderChallengesHome() {
+            const upcomingDiv = document.getElementById("upcomingChallengeSection");
+            const pastListDiv = document.getElementById("pastChallengesList");
+            
+            pastListDiv.innerHTML = "";
+            
+            // فصل التحديات المعلقة (القادمة) عن المنتهية
+            let pendingChallenges = challenges.filter(c => c.status === "Pending");
+            let resolvedChallenges = challenges.filter(c => c.status === "Resolved");
+
+            // عرض التحدي القادم (نأخذ آخر تحدي تم إرساله ولم يُحل بعد)
+            if(pendingChallenges.length > 0) {
+                let latest = pendingChallenges[pendingChallenges.length - 1];
+                upcomingDiv.innerHTML = `
+                    <div class="upcoming-challenge-box">
+                        <div class="upcoming-title">🔥 التحدي القادم في المناورة</div>
+                        <div class="vs-container">
+                            <div class="p-name" style="color: #fbbf24;">${latest.fromName}</div>
+                            <div class="vs-circle">VS</div>
+                            <div class="p-name" style="color: #3b82f6;">${latest.toName}</div>
+                        </div>
+                        <span class="bet-points">على رهان: ${latest.points} نقطة ⚔️</span>
+                    </div>
+                `;
+            } else {
+                upcomingDiv.innerHTML = `
+                    <div class="upcoming-challenge-box" style="background:#1e293b; border-color:#475569; box-shadow:none;">
+                        <p style="margin:0; color:#94a3b8; font-weight:bold;">⏳ لا يوجد تحدي قائم حالياً.. من يبدأ الرهان؟</p>
+                    </div>
+                `;
+            }
+
+            // عرض التحديات السابقة
+            if(resolvedChallenges.length === 0) {
+                pastListDiv.innerHTML = "<p style='text-align:center; color:#94a3b8; font-size:0.9rem; margin:0;'>لا توجد تحديات منتهية بعد.</p>";
+            } else {
+                // عرض من الأحدث للأقدم
+                resolvedChallenges.reverse().forEach(c => {
+                    pastListDiv.innerHTML += `
+                        <div class="past-row">
+                            <div>
+                                <strong>${c.fromName}</strong> <span style="color:#64748b;">ضد</span> <strong>${c.toName}</strong>
+                                <br><span style="color:#94a3b8; font-size:0.8rem;">الرهان: ${c.points} ن</span>
+                            </div>
+                            <div class="winner-tag">👑 الفائز: ${c.winnerName}</div>
+                        </div>
+                    `;
+                });
+            }
+        }
+
+        // 2. عرض الـ Top 5 لـ ليدربورد
+        function renderLeaderboard() {
+            const listDiv = document.getElementById("leaderboardList");
+            listDiv.innerHTML = "";
+            let arr = Object.values(playersDB).sort((a,b) => b.points - a.points).slice(0, 5);
+            arr.forEach((p, i) => {
+                listDiv.innerHTML += `<div class="rank-row ${i==0?'rank-1':''}">
+                    <div class="player-info">
+                        <img src="${p.image||'https://cdn-icons-png.flaticon.com/512/3135/3135715.png'}" class="avatar">
+                        <span>${p.name}</span>
+                    </div>
+                    <span>${p.points} نقطة</span>
+                </div>`;
+            });
+        }
+
+        // تشغيل الدوال عند الفتح
+        renderChallengesHome();
+        renderLeaderboard();
+
+        // دالة تسجيل الدخول
+        function loginPlayer() {
+            let code = document.getElementById("codeInput").value.trim().toUpperCase();
+            if(playersDB[code]) { 
+                localStorage.setItem("currentPlayerCode", code); 
+                window.location.href = "dashboard.html"; 
+            } else { 
+                alert("الكود السري غير صحيح!"); 
+            }
+        }
+    </script>
+</body>
+</html>

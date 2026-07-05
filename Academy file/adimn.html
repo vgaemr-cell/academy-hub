@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>غرفة القيادة | أكاديمية الجيل الجديد</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #0f172a; color: #f8fafc; margin: 0; padding: 40px 20px; display: flex; flex-direction: column; align-items: center; }
+        .container { width: 100%; max-width: 700px; }
+        .header { text-align: center; border-bottom: 2px solid #f97316; padding-bottom: 15px; margin-bottom: 30px; }
+        .header h1 { color: #f97316; margin: 0; }
+        
+        #loginScreen { background: #1e293b; padding: 40px; border-radius: 15px; text-align: center; border: 1px solid #334155; box-shadow: 0 10px 30px rgba(0,0,0,0.5); margin-top: 50px; }
+        .password-container { position: relative; width: 80%; margin: 0 auto 20px auto; }
+        .input-admin { background-color: #0f172a; border: 1px solid #475569; color: white; padding: 15px; font-size: 1.1rem; border-radius: 8px; width: 100%; text-align: center; box-sizing: border-box; direction: ltr; }
+        .input-admin-rtl { background-color: #0f172a; border: 1px solid #475569; color: white; padding: 15px; font-size: 1rem; border-radius: 8px; width: 100%; box-sizing: border-box; direction: rtl; margin-bottom: 15px; }
+        .toggle-password { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #94a3b8; user-select: none; font-size: 1.2rem; }
+        .error-message { color: #ef4444; font-size: 0.95rem; margin-top: -10px; margin-bottom: 20px; display: none; font-weight: bold; }
+        
+        .btn-admin { background-color: #f97316; color: white; padding: 12px 30px; font-size: 1.1rem; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; width: 85%; transition: 0.3s; }
+        .btn-admin:hover { background-color: #ea580c; }
+        
+        #dashboardScreen { display: none; }
+        .section-box { background: #1e293b; padding: 25px; border-radius: 15px; border: 1px solid #334155; margin-bottom: 25px; }
+        .section-box h3 { color: #f97316; margin-top: 0; border-bottom: 1px dashed #475569; padding-bottom: 10px; }
+        textarea { width: 100%; background: #0f172a; color: white; border: 1px solid #475569; border-radius: 8px; padding: 15px; font-size: 1rem; font-family: inherit; resize: vertical; min-height: 80px; box-sizing: border-box; }
+        
+        /* التحديات */
+        .challenge-row { background: #0f172a; padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #475569; border-right: 4px solid #ef4444; display: flex; flex-direction: column; gap: 10px; }
+        .challenge-header { display: flex; justify-content: space-between; align-items: center; font-weight: bold; }
+        .challenge-actions { display: flex; gap: 10px; }
+        .btn-challenge { flex: 1; padding: 10px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; color: white; transition: 0.3s; }
+        .btn-win-1 { background-color: #22c55e; } .btn-win-1:hover { background-color: #16a34a; }
+        .btn-win-2 { background-color: #3b82f6; } .btn-win-2:hover { background-color: #2563eb; }
+        .btn-cancel-ch { background-color: #ef4444; } .btn-cancel-ch:hover { background-color: #dc2626; }
+
+        /* الرصد */
+        .player-row { display: flex; flex-direction: column; background: #0f172a; padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #475569; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); }
+        .player-header-row { display: flex; justify-content: space-between; align-items: center; }
+        .player-name { font-weight: bold; font-size: 1.1rem; }
+        .task-status { font-size: 0.85rem; margin-top: 6px; display: block; font-weight: normal; }
+        .points-input { width: 80px; background: #1e293b; border: 1px solid #f97316; color: #f97316; padding: 8px; font-size: 1.2rem; font-weight: bold; text-align: center; border-radius: 5px; transition: 0.3s; }
+        
+        .eval-row { display: flex; gap: 10px; margin-top: 15px; }
+        .eval-select { background-color: #1e293b; color: #cbd5e1; border: 1px solid #334155; padding: 8px; border-radius: 5px; font-family: inherit; width: 100%; outline: none; font-size: 0.95rem; cursor: pointer; transition: 0.2s; }
+        .eval-select:focus { border-color: #f97316; color: white; }
+        
+        .btn-save { background-color: #22c55e; width: 100%; font-size: 1.3rem; padding: 15px; margin-top: 10px; border: none; border-radius: 8px; color: white; cursor: pointer; font-weight: bold; }
+        .btn-save:hover { background-color: #16a34a; }
+        
+        .btn-reset { background-color: #ef4444; width: 100%; font-size: 1.1rem; padding: 12px; margin-top: 15px; border: none; border-radius: 8px; color: white; cursor: pointer; font-weight: bold; }
+        .btn-reset:hover { background-color: #dc2626; }
+        
+        .add-player-row { display: flex; gap: 10px; margin-bottom: 15px; }
+        .add-player-row input { width: 50%; margin-bottom: 0; }
+        .btn-add { background-color: #3b82f6; width: 100%; margin-top: 10px; }
+        .btn-add:hover { background-color: #2563eb; }
+        
+        .btn-bulk { background-color: #3b82f6; color: white; border: none; border-radius: 6px; padding: 8px 15px; cursor: pointer; font-size: 0.9rem; font-weight: bold; transition: 0.3s; }
+        .btn-bulk:hover { background-color: #2563eb; }
+        
+        .header-flex { display: flex; flex-direction: column; gap: 15px; border-bottom: 1px dashed #475569; padding-bottom: 15px; margin-bottom: 15px; }
+        .header-top { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+        .header-top h3 { border: none; margin: 0; padding: 0; }
+        .date-picker { background: #0f172a; border: 1px solid #f97316; color: white; padding: 8px; border-radius: 5px; font-family: inherit; font-size: 1rem; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div id="loginScreen">
+            <h2 style="color: #f97316; margin-top:0;">غرفة القيادة السريّة</h2>
+            <p>أدخل الرمز السري</p>
+            <div class="password-container">
+                <input type="password" id="passCode" class="input-admin" placeholder="****">
+                <span class="toggle-password" id="togglePass">👁️</span>
+            </div>
+            <div id="errorMessage" class="error-message">الرمز السري غير صحيح! ❌</div>
+            <button class="btn-admin" onclick="checkAdmin()">تسجيل الدخول</button>
+        </div>
+
+        <div id="dashboardScreen">
+            <div class="header">
+                <h1>غرفة القيادة | C. Hammam</h1>
+            </div>
+
+            <!-- قسم الفيديو التحليلي الجديد -->
+            <div class="section-box">
+                <h3>🎥 التحليل الفني (الغرفة التكتيكية)</h3>
+                <input type="text" id="videoUrlInput" class="input-admin-rtl" placeholder="ضع رابط فيديو يوتيوب هنا (مثال: https://youtu.be/...)">
+                <textarea id="videoQuestionInput" placeholder="اكتب السؤال التكتيكي أو المطلوب من اللاعبين ملاحظته في هذا الفيديو..."></textarea>
+                <button class="btn-admin btn-add" style="background-color: #8b5cf6;" onclick="saveVideoTask()">نشر التحدي التكتيكي للعيال 📺</button>
+                
+                <h4 style="color:#cbd5e1; margin-top:20px; border-bottom:1px solid #334155; padding-bottom:5px;">إجابات اللاعبين على الفيديو الحالي:</h4>
+                <div id="videoAnswersList"></div>
+            </div>
+
+            <!-- قسم التحديات -->
+            <div class="section-box">
+                <h3>⚔️ إدارة تحديات المناورات</h3>
+                <div id="adminChallengesList"></div>
+            </div>
+
+            <!-- قسم ملفات اللاعبين التفصيلية -->
+            <div class="section-box">
+                <h3>🔍 استعراض الملف الشامل للاعب</h3>
+                <select id="playerProfileSelect" class="eval-select" style="padding: 12px; font-size: 1.1rem;" onchange="showPlayerProfile()">
+                    <!-- يتم التعبئة برمجياً -->
+                </select>
+                
+                <div id="playerProfileCard" style="display:none; margin-top:15px; background:#0f172a; padding:20px; border-radius:8px; border:1px solid #f97316;">
+                    <!-- تفاصيل اللاعب تظهر هنا -->
+                </div>
+            </div>
+
+            <!-- قسم إضافة لاعب -->
+            <div class="section-box">
+                <h3>➕ إضافة لاعب جديد</h3>
+                <div class="add-player-row">
+                    <input type="text" id="newPlayerName" class="input-admin" placeholder="اسم اللاعب" style="direction: rtl;">
+                    <input type="text" id="newPlayerCode" class="input-admin" placeholder="الكود (HA-XXXX)">
+                </div>
+                <button class="btn-admin btn-add" onclick="addNewPlayer()">إضافة</button>
+            </div>
+
+            <!-- المهمة اليومية النصية -->
+            <div class="section-box">
+                <h3>📝 توجيه المهمة اليومية النصية</h3>
+                <textarea id="taskInput">مرحباً بالكتيبة، جاهزين للموسم الجديد؟</textarea>
+            </div>
+
+            <!-- قائمة الرصد والتحضير -->
+            <div class="section-box">
+                <div class="header-flex">
+                    <div class="header-top">
+                        <h3>📋 التحضير والتقييم الذكي</h3>
+                        <input type="date" id="evalDate" class="date-picker" onchange="renderPlayers()">
+                    </div>
+                    <button class="btn-bulk" onclick="markAllPresent()">✅ تحضير الكتيبة بالكامل (حاضر)</button>
+                </div>
+                <div id="playersAdminList"></div>
+            </div>
+
+            <button class="btn-save" onclick="saveAllUpdates()">اعتماد وتوثيق اليوم 🚀</button>
+            <button class="btn-reset" onclick="resetAllPoints()">⚠️ تصفير جميع النقاط وبدء موسم جديد</button>
+        </div>
+    </div>
+
+    <script>
+        // القائمة الافتراضية كاملة للـ 16 لاعب!
+        const defaultPlayers = {
+            "HA-9X4M": { code: "HA-9X4M", name: "فارس", points: 0, weeklyChange: 0, basePoints: 0, history: {}, tasksDone: {}, videoAnswer: "" },
+            "HA-2B7V": { code: "HA-2B7V", name: "عبد الله البلوشي", points: 0, weeklyChange: 0, basePoints: 0, history: {}, tasksDone: {}, videoAnswer: "" },
+            "HA-8K3P": { code: "HA-8K3P", name: "عبد الرحمن المزيد", points: 0, weeklyChange: 0, basePoints: 0, history: {}, tasksDone: {}, videoAnswer: "" },
+            "HA-5W1R": { code: "HA-5W1R", name: "اصيل السعيد", points: 0, weeklyChange: 0, basePoints: 0, history: {}, tasksDone: {}, videoAnswer: "" },
+            "HA-7T9Z": { code: "HA-7T9Z", name: "مهند محمد", points: 0, weeklyChange: 0, basePoints: 0, history: {}, tasksDone: {}, videoAnswer: "" },
+            "HA-N7W1": { code: "HA-N7W1", name: "نواف الرشيدي", points: 0, weeklyChange: 0, basePoints: 0, history: {}, tasksDone: {}, videoAnswer: "" },
+            "HA-S3L8": { code: "HA-S3L8", name: "عبدالله سلامه", points: 0, weeklyChange: 0, basePoints: 0, history: {}, tasksDone: {}, videoAnswer: "" },
+            "HA-M4H2": { code: "HA-M4H2", name: "ماهر الحربي", points: 0, weeklyChange: 0, basePoints: 0, history: {}, tasksDone: {}, videoAnswer: "" },
+            "HA-R9S4": { code: "HA-R9S4", name: "عبد الرحمن السريحي", points: 0, weeklyChange: 0, basePoints: 0, history: {}, tasksDone: {}, videoAnswer: "" },
+            "HA-F2M7": { code: "HA-F2M7", name: "عبد الله فواز المطيري", points: 0, weeklyChange: 0, basePoints: 0, history: {}, tasksDone: {}, videoAnswer: "" },
+            "HA-A8K3": { code: "HA-A8K3", name: "احمد خالد المطيري", points: 0, weeklyChange: 0, basePoints: 0, history: {}, tasksDone: {}, videoAnswer: "" },
+            "HA-M5N1": { code: "HA-M5N1", name: "صالح المنهالي", points: 0, weeklyChange: 0, basePoints: 0, history: {}, tasksDone: {}, videoAnswer: "" },
+            "HA-Y9A4": { code: "HA-Y9A4", name: "انور اکرم اليافعي", points: 0, weeklyChange: 0, basePoints: 0, history: {}, tasksDone: {}, videoAnswer: "" },
+            "HA-T5R2": { code: "HA-T5R2", name: "معتز الرشيدي", points: 0, weeklyChange: 0, basePoints: 0, history: {}, tasksDone: {}, videoAnswer: "" },
+            "HA-Z6R9": { code: "HA-Z6R9", name: "زياد الرفاعي", points: 0, weeklyChange: 0, basePoints: 0, history: {}, tasksDone: {}, videoAnswer: "" },
+            "HA-C1K9": { code: "HA-C1K9", name: "سهل عبد الكريم", points: 0, weeklyChange: 0, basePoints: 0, history: {}, tasksDone: {}, videoAnswer: "" }
+        };
+
+        let playersDB = null;
+        try { 
+            let data = localStorage.getItem("academyDB");
+            if (data && data !== "undefined") { playersDB = JSON.parse(data); }
+        } catch(e) {}
+        
+        // التحقق من وجود قاعدة بيانات، وإذا فارغة يعبيها بالـ 16 لاعب
+        if (!playersDB || typeof playersDB !== 'object' || Object.keys(playersDB).length < 2) {
+            playersDB = JSON.parse(JSON.stringify(defaultPlayers));
+            localStorage.setItem("academyDB", JSON.stringify(playersDB));
+        }
+
+        for (let code in playersDB) {
+            if (playersDB[code].basePoints === undefined) {
+                playersDB[code].basePoints = playersDB[code].points; 
+                playersDB[code].history = {}; 
+                playersDB[code].tasksDone = {}; 
+                playersDB[code].videoAnswer = "";
+            }
+        }
+
+        function getLocalToday() {
+            let d = new Date();
+            d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+            return d.toISOString().split('T')[0];
+        }
+
+        const passInput = document.getElementById("passCode");
+        const toggleBtn = document.getElementById("togglePass");
+        const errorMsg = document.getElementById("errorMessage");
+
+        toggleBtn.addEventListener("click", function() {
+            if (passInput.type === "password") { passInput.type = "text"; toggleBtn.innerText = "🔒"; } 
+            else { passInput.type = "password"; toggleBtn.innerText = "👁️"; }
+        });
+
+        function checkAdmin() {
+            const enteredPass = passInput.value.trim();
+            if (enteredPass === "a909090A") {
+                errorMsg.style.display = "none";
+                passInput.style.borderColor = "#475569";
+                document.getElementById("loginScreen").style.display = "none";
+                document.getElementById("dashboardScreen").style.display = "block";
+                
+                let savedTask = localStorage.getItem("academyTask");
+                if(savedTask) document.getElementById("taskInput").value = savedTask;
+                
+                document.getElementById("evalDate").value = getLocalToday();
+                renderPlayers();
+                renderAdminChallenges();
+                loadVideoTask();
+                populateProfileSelect();
+            } else { 
+                errorMsg.style.display = "block";
+                passInput.style.borderColor = "#ef4444";
+            }
+        }
+
+        passInput.addEventListener("input", function() { errorMsg.style.display = "none"; passInput.style.borderColor = "#475569"; });
+
+        // === قسم الفيديو التحليلي ===
+        function loadVideoTask() {
+            let vt = JSON.parse(localStorage.getItem("academyVideoTask")) || { url: "", question: "" };
+            document.getElementById("videoUrlInput").value = vt.url;
+            document.getElementById("videoQuestionInput").value = vt.question;
+            renderVideoAnswers();
+        }
+
+        function saveVideoTask() {
+            let url = document.getElementById("videoUrlInput").value.trim();
+            let question = document.getElementById("videoQuestionInput").value.trim();
+            
+            if(!url || !question) {
+                alert("الرجاء إدخال الرابط والسؤال!"); return;
+            }
+
+            localStorage.setItem("academyVideoTask", JSON.stringify({ url: url, question: question }));
+            
+            if(confirm("هل تريد مسح إجابات الفيديو السابقة من ملفات اللاعبين للبدء بهذا التحدي الجديد؟")) {
+                for(let code in playersDB) {
+                    playersDB[code].videoAnswer = "";
+                }
+                localStorage.setItem("academyDB", JSON.stringify(playersDB));
+                renderVideoAnswers();
+            }
+            alert("تم اعتماد ونشر الفيديو التكتيكي للعيال بنجاح!");
+        }
+
+        function renderVideoAnswers() {
+            let list = document.getElementById("videoAnswersList");
+            list.innerHTML = "";
+            let hasAnswers = false;
+            
+            for(let code in playersDB) {
+                if(playersDB[code].videoAnswer && playersDB[code].videoAnswer.trim() !== "") {
+                    hasAnswers = true;
+                    list.innerHTML += `
+                        <div style="background:#0f172a; padding:12px; border-radius:6px; margin-bottom:8px; border-right:3px solid #8b5cf6;">
+                            <strong style="color:#fbbf24; font-size:1.1rem;">${playersDB[code].name}:</strong> 
+                            <p style="margin:5px 0 0 0; color:#e2e8f0; line-height:1.5;">${playersDB[code].videoAnswer}</p>
+                        </div>
+                    `;
+                }
+            }
+            if(!hasAnswers) list.innerHTML = "<p style='color:#94a3b8; font-size:0.95rem;'>لم يرسل أي لاعب إجابته حتى الآن.</p>";
+        }
+
+        // === قسم عرض تفاصيل اللاعب ===
+        function populateProfileSelect() {
+            let select = document.getElementById("playerProfileSelect");
+            select.innerHTML = '<option value="">-- اختر لاعب لعرض تفاصيله بالكامل --</option>';
+            let playersArray = Object.values(playersDB).sort((a, b) => b.points - a.points);
+            
+            playersArray.forEach(p => {
+                select.innerHTML += `<option value="${p.code}">${p.name}</option>`;
+            });
+        }
+
+        function showPlayerProfile() {
+            let code = document.getElementById("playerProfileSelect").value;
+            let card = document.getElementById("playerProfileCard");
+            
+            if(!code) { card.style.display = 'none'; return; }
+            
+            let p = playersDB[code];
+            let histCount = Object.keys(p.history).length;
+            let today = getLocalToday();
+            let taskStatus = (p.tasksDone && p.tasksDone[today]) ? '<span style="color:#4ade80;">✅ أنجزها اليوم</span>' : '<span style="color:#ef4444;">⏳ لم ينجز المهمة</span>';
+            let videoAns = (p.videoAnswer) ? p.videoAnswer : '<span style="color:#94a3b8;">لم يجاوب على الفيديو التكتيكي بعد</span>';
+            
+            card.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <h3 style="color:#f97316; margin:0; font-size:1.5rem;">👤 ${p.name}</h3>
+                    <span style="background:#1e293b; padding:5px 10px; border-radius:5px; color:#a3e635; font-weight:bold;">${p.points} نقطة</span>
+                </div>
+                <p style="margin-top:15px;"><strong>الكود السري:</strong> <span style="color:#94a3b8; font-family:monospace; background:#1e293b; padding:2px 5px; border-radius:4px;">${p.code}</span></p>
+                <p><strong>أيام الحضور المسجلة بالسيستم:</strong> ${histCount} يوم</p>
+                <p><strong>حالة المهمة اليومية النصية:</strong> ${taskStatus}</p>
+                <div style="background:#1e293b; padding:10px; border-radius:5px; margin-top:10px;">
+                    <strong style="color:#8b5cf6;">إجابته التكتيكية الأخيرة:</strong>
+                    <p style="margin:5px 0 0 0; font-size:0.9rem;">${videoAns}</p>
+                </div>
+                <hr style="border-color:#334155; margin: 15px 0;">
+                <button onclick="deletePlayerProfile('${code}')" style="background:#ef4444; color:white; border:none; padding:8px 15px; border-radius:5px; cursor:pointer; font-weight:bold; width:100%;">حذف اللاعب نهائياً من الأكاديمية ❌</button>
+            `;
+            card.style.display = 'block';
+        }
+
+        function deletePlayerProfile(code) {
+             if(confirm("تحذير ⚠️: هل أنت متأكد من حذف اللاعب نهائياً ومسح جميع نقاطه من النظام؟")) {
+                 let name = playersDB[code].name;
+                 delete playersDB[code];
+                 localStorage.setItem("academyDB", JSON.stringify(playersDB));
+                 document.getElementById("playerProfileCard").style.display = 'none';
+                 renderPlayers();
+                 populateProfileSelect();
+                 alert("تم حذف اللاعب " + name + " بنجاح.");
+             }
+        }
+
+        // === قسم التحديات ===
+        function renderAdminChallenges() {
+            const listDiv = document.getElementById("adminChallengesList");
+            listDiv.innerHTML = "";
+            let challenges = JSON.parse(localStorage.getItem("academyChallenges")) || [];
+            let pending = challenges.filter(c => c.status === "Pending");
+
+            if(pending.length === 0) {
+                listDiv.innerHTML = "<p style='color:#94a3b8; margin:0; text-align:center;'>لا توجد تحديات معلقة حالياً.</p>";
+                return;
+            }
+
+            pending.forEach((c) => {
+                listDiv.innerHTML += `
+                    <div class="challenge-row">
+                        <div class="challenge-header">
+                            <div>
+                                <span style="color:#fbbf24;">${c.fromName}</span> 
+                                <span style="color:#94a3b8; font-weight:normal;">ضد</span> 
+                                <span style="color:#3b82f6;">${c.toName}</span>
+                            </div>
+                            <span style="color:#a3e635;">الرهان: ${c.points} ن</span>
+                        </div>
+                        <div class="challenge-actions">
+                            <button onclick="resolveChallenge(${c.id}, '${c.fromCode}', '${c.fromName}', '${c.toCode}', ${c.points})" class="btn-challenge btn-win-1">فوز ${c.fromName}</button>
+                            <button onclick="resolveChallenge(${c.id}, '${c.toCode}', '${c.toName}', '${c.fromCode}', ${c.points})" class="btn-challenge btn-win-2">فوز ${c.toName}</button>
+                            <button onclick="cancelChallenge(${c.id})" class="btn-challenge btn-cancel-ch">إلغاء</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function resolveChallenge(challengeId, winnerCode, winnerName, loserCode, points) {
+            let challenges = JSON.parse(localStorage.getItem("academyChallenges")) || [];
+            
+            let histTotalLoser = 0;
+            for (let d in playersDB[loserCode].history) {
+                histTotalLoser += (playersDB[loserCode].history[d].att + playersDB[loserCode].history[d].perf);
+            }
+            let loserTotalPoints = playersDB[loserCode].basePoints + histTotalLoser;
+
+            if(loserTotalPoints < points) {
+                return alert("مرفوض! نقاط اللاعب الخاسر غير كافية حالياً لدفع الرهان.");
+            }
+
+            playersDB[winnerCode].basePoints += points;
+            playersDB[loserCode].basePoints -= points;
+            
+            localStorage.setItem("academyDB", JSON.stringify(playersDB));
+
+            let cIndex = challenges.findIndex(c => c.id === challengeId);
+            if(cIndex !== -1) {
+                challenges[cIndex].status = "Resolved";
+                challenges[cIndex].winnerName = winnerName;
+                localStorage.setItem("academyChallenges", JSON.stringify(challenges));
+            }
+            
+            alert(`تم إعلان فوز ${winnerName} وتحويل ${points} نقطة بنجاح!`);
+            renderAdminChallenges();
+            renderPlayers();
+            populateProfileSelect();
+        }
+
+        function cancelChallenge(challengeId) {
+            if(confirm("هل أنت متأكد من إلغاء التحدي؟")) {
+                let challenges = JSON.parse(localStorage.getItem("academyChallenges")) || [];
+                let filtered = challenges.filter(c => c.id !== challengeId);
+                localStorage.setItem("academyChallenges", JSON.stringify(filtered));
+                renderAdminChallenges();
+            }
+        }
+
+        // === قسم الرصد وقائمة التحضير ===
+        function renderPlayers() {
+            const listDiv = document.getElementById("playersAdminList");
+            listDiv.innerHTML = "";
+            let selectedDate = document.getElementById("evalDate").value;
+
+            for (let code in playersDB) {
+                let histTotal = 0;
+                for (let d in playersDB[code].history) {
+                    histTotal += (playersDB[code].history[d].att + playersDB[code].history[d].perf);
+                }
+                playersDB[code].points = playersDB[code].basePoints + histTotal;
+            }
+
+            let playersArray = Object.values(playersDB).sort((a, b) => b.points - a.points);
+
+            playersArray.forEach(p => {
+                let record = p.history[selectedDate] || { att: "none", perf: "none" };
+                
+                let taskStatusHTML = (p.tasksDone && p.tasksDone[selectedDate]) 
+                    ? `<span class="task-status" style="color:#4ade80;">✅ أنجز المهمة</span>` 
+                    : `<span class="task-status" style="color:#ef4444;">⏳ لم ينجز المهمة</span>`;
+
+                listDiv.innerHTML += `
+                    <div class="player-row">
+                        <div class="player-header-row">
+                            <div class="player-name">
+                                👤 ${p.name} <span style="color:#94a3b8; font-size:0.85em; font-weight:normal;" id="pts_display_${p.code}">(${p.points} ن)</span>
+                                ${taskStatusHTML}
+                            </div>
+                            <input type="number" id="pts_${p.code}" class="points-input" value="${p.points}" onchange="manualPointEdit('${p.code}')">
+                        </div>
+                        <div class="eval-row">
+                            <select id="att_${p.code}" class="eval-select" onchange="autoCalc('${p.code}')">
+                                <option value="none" ${record.att === "none" ? 'selected' : ''}>التحضير (-)</option>
+                                <option value="10" ${record.att === 10 ? 'selected' : ''}>✅ حاضر (+10)</option>
+                                <option value="0" ${record.att === 0 ? 'selected' : ''}>⚠️ غائب بعذر (0)</option>
+                                <option value="-5" ${record.att === -5 ? 'selected' : ''}>❌ غائب (-5)</option>
+                            </select>
+                            <select id="perf_${p.code}" class="eval-select" onchange="autoCalc('${p.code}')">
+                                <option value="none" ${record.perf === "none" ? 'selected' : ''}>التقييم اليومي (-)</option>
+                                <option value="4" ${record.perf === 4 ? 'selected' : ''}>🌟 استثنائي (+4)</option>
+                                <option value="3" ${record.perf === 3 ? 'selected' : ''}>🔥 ممتاز (+3)</option>
+                                <option value="2" ${record.perf === 2 ? 'selected' : ''}>👍 جيد (+2)</option>
+                                <option value="1" ${record.perf === 1 ? 'selected' : ''}>📉 مقبول (+1)</option>
+                            </select>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function autoCalc(code) {
+            let selectedDate = document.getElementById("evalDate").value;
+            let p = playersDB[code];
+            let otherDaysTotal = 0;
+            for (let d in p.history) {
+                if (d !== selectedDate) { otherDaysTotal += (p.history[d].att + p.history[d].perf); }
+            }
+            let attVal = document.getElementById('att_' + code).value;
+            let perfVal = document.getElementById('perf_' + code).value;
+            let currentAtt = attVal === "none" ? 0 : parseInt(attVal);
+            let currentPerf = perfVal === "none" ? 0 : parseInt(perfVal);
+            let newTotal = p.basePoints + otherDaysTotal + currentAtt + currentPerf;
+            
+            let inputElem = document.getElementById('pts_' + code);
+            inputElem.value = newTotal;
+            inputElem.style.backgroundColor = "#4ade80";
+            inputElem.style.color = "#0f172a";
+            setTimeout(() => { inputElem.style.backgroundColor = "#1e293b"; inputElem.style.color = "#f97316"; }, 500);
+        }
+
+        function manualPointEdit(code) {
+            let selectedDate = document.getElementById("evalDate").value;
+            let typedTotal = parseInt(document.getElementById('pts_' + code).value) || 0;
+            let otherDaysTotal = 0;
+            for (let d in playersDB[code].history) {
+                if (d !== selectedDate) { otherDaysTotal += (playersDB[code].history[d].att + playersDB[code].history[d].perf); }
+            }
+            let attVal = document.getElementById('att_' + code).value;
+            let perfVal = document.getElementById('perf_' + code).value;
+            let currentAtt = attVal === "none" ? 0 : parseInt(attVal);
+            let currentPerf = perfVal === "none" ? 0 : parseInt(perfVal);
+            playersDB[code].basePoints = typedTotal - (otherDaysTotal + currentAtt + currentPerf);
+        }
+
+        function markAllPresent() {
+            let playersArray = Object.values(playersDB);
+            playersArray.forEach(p => {
+                let attSelect = document.getElementById('att_' + p.code);
+                if(attSelect) { attSelect.value = "10"; autoCalc(p.code); }
+            });
+        }
+
+        function addNewPlayer() {
+            const name = document.getElementById("newPlayerName").value.trim();
+            const code = document.getElementById("newPlayerCode").value.trim().toUpperCase();
+            if (name === "" || code === "") { alert("الرجاء كتابة اسم اللاعب والكود!"); return; }
+            if (playersDB[code]) { alert("هذا الكود مستخدم، جرب كود ثاني!"); return; }
+            playersDB[code] = { code: code, name: name, points: 0, basePoints: 0, weeklyChange: 0, history: {}, tasksDone: {}, videoAnswer: "" };
+            localStorage.setItem("academyDB", JSON.stringify(playersDB));
+            document.getElementById("newPlayerName").value = "";
+            document.getElementById("newPlayerCode").value = "";
+            renderPlayers();
+            populateProfileSelect(); // تحديث القائمة
+            alert("تم إضافة " + name + " بنجاح!");
+        }
+
+        function saveAllUpdates() {
+            let selectedDate = document.getElementById("evalDate").value;
+            for (let code in playersDB) {
+                let attVal = document.getElementById("att_" + code).value;
+                let perfVal = document.getElementById("perf_" + code).value;
+                if (attVal !== "none" || perfVal !== "none") {
+                    let a = attVal === "none" ? 0 : parseInt(attVal);
+                    let p = perfVal === "none" ? 0 : parseInt(perfVal);
+                    playersDB[code].history[selectedDate] = { att: a, perf: p };
+                } else {
+                    delete playersDB[code].history[selectedDate];
+                }
+                let histTotal = 0;
+                for (let d in playersDB[code].history) {
+                    histTotal += (playersDB[code].history[d].att + playersDB[code].history[d].perf);
+                }
+                const oldPoints = playersDB[code].points;
+                const newPoints = playersDB[code].basePoints + histTotal;
+                playersDB[code].points = newPoints;
+                playersDB[code].weeklyChange = newPoints - oldPoints; 
+            }
+            localStorage.setItem("academyDB", JSON.stringify(playersDB));
+            localStorage.setItem("academyTask", document.getElementById("taskInput").value);
+            alert("تم التوثيق بنجاح لليوم!");
+            renderPlayers();
+            populateProfileSelect();
+        }
+
+        function resetAllPoints() {
+            if (confirm("⚠️ تحذير: هل أنت متأكد أنك تريد تصفير نقاط جميع اللاعبين ومسح الأرشيف للبدء من جديد؟")) {
+                for (let code in playersDB) {
+                    playersDB[code].points = 0;
+                    playersDB[code].basePoints = 0;
+                    playersDB[code].weeklyChange = 0;
+                    playersDB[code].history = {};
+                    playersDB[code].tasksDone = {}; 
+                    playersDB[code].videoAnswer = ""; 
+                }
+                localStorage.setItem("academyDB", JSON.stringify(playersDB));
+                localStorage.removeItem("academyChallenges"); 
+                localStorage.removeItem("academyVideoTask"); 
+                alert("تم تصفير جميع النقاط بنجاح!");
+                renderPlayers();
+                renderAdminChallenges();
+                loadVideoTask();
+                populateProfileSelect();
+            }
+        }
+    </script>
+    
+</body>
+</html>

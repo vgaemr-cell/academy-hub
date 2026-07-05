@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ملف اللاعب | أكاديمية الجيل الجديد</title>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background-color: #0f172a; 
+            color: #f8fafc; 
+            margin: 0; 
+            padding: 0;
+            padding-bottom: 80px; /* تم التعديل لتوسيع القائمة السفلية */
+        }
+        
+        .top-bar {
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            background: #1e293b;
+            padding: 15px 20px;
+            border-bottom: 1px solid #334155;
+        }
+        .top-bar h2 { color: #f97316; margin: 0; font-size: 1.3rem; }
+        .btn-logout { background: transparent; border: 1px solid #ef4444; color: #ef4444; padding: 5px 12px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        
+        .container { padding: 20px; max-width: 600px; margin: 0 auto; }
+        
+        .tab-content { display: none; animation: fadeIn 0.3s ease-in-out; }
+        .tab-content.active { display: block; }
+        
+        /* ستايل الرئيسية */
+        .profile-section { display: flex; flex-direction: column; align-items: center; background: #1e293b; padding: 25px; border-radius: 15px; border: 1px solid #334155; margin-bottom: 20px; }
+        .avatar-container { position: relative; margin-bottom: 15px; }
+        .avatar { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid #f97316; background-color: #0f172a; }
+        .upload-btn { position: absolute; bottom: 0; right: 0; background: #3b82f6; color: white; border: none; border-radius: 50%; width: 30px; height: 30px; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        #imageUpload { display: none; }
+        
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+        .stat-card { background: #1e293b; padding: 20px; border-radius: 10px; text-align: center; border: 1px solid #334155; }
+        .stat-card h3 { color: #f97316; margin: 5px 0 0 0; font-size: 1.8rem; }
+        .stat-card p { margin: 0; color: #94a3b8; font-size: 0.9rem; }
+        
+        .task-box { background: #1e293b; border-right: 4px solid #3b82f6; padding: 20px; border-radius: 10px; border: 1px solid #334155; }
+        .btn-done { background: #3b82f6; color: white; border: none; width: 100%; padding: 12px; margin-top: 15px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        
+        /* ستايل التقدم */
+        .progress-box { background: #1e293b; padding: 20px; border-radius: 10px; border: 1px solid #334155; }
+        .progress-bar-bg { background: #0f172a; border-radius: 10px; height: 20px; width: 100%; margin-top: 10px; overflow: hidden; border: 1px solid #475569; }
+        .progress-fill { background: linear-gradient(90deg, #f97316, #fbbf24); height: 100%; width: 0%; transition: width 1s ease-in-out; }
+        
+        /* ستايل الحضور */
+        .history-list { display: flex; flex-direction: column; gap: 10px; }
+        .history-item { background: #1e293b; padding: 15px; border-radius: 8px; border: 1px solid #334155; display: flex; justify-content: space-between; align-items: center; }
+        
+        /* ستايل التحديات الجديد */
+        .challenge-form { background: #1e293b; padding: 20px; border-radius: 10px; border: 1px solid #334155; margin-bottom: 20px; }
+        .challenge-form select, .challenge-form input { width: 100%; padding: 10px; margin-top: 10px; background: #0f172a; border: 1px solid #475569; color: white; border-radius: 6px; box-sizing: border-box; }
+        .btn-challenge { background: #f97316; color: white; border: none; width: 100%; padding: 12px; margin-top: 15px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        
+        .challenge-card { background: #1e293b; padding: 15px; border-radius: 8px; border: 1px solid #334155; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .badge-points { background: rgba(249, 115, 22, 0.2); color: #f97316; padding: 3px 8px; border-radius: 5px; font-weight: bold; }
+
+        /* ستايل الغرفة التكتيكية والفيديو الجديد 🎥 */
+        .video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; background: #000; border-radius: 8px; margin-top: 15px; border: 1px solid #475569; }
+        .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+        textarea { width: 100%; background: #0f172a; color: white; border: 1px solid #475569; border-radius: 8px; padding: 12px; font-size: 1rem; font-family: inherit; resize: vertical; min-height: 70px; box-sizing: border-box; margin-top: 10px; }
+
+        /* القائمة السفلية */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #1e293b; display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid #334155; z-index: 1000; }
+        /* تم تعديل العرض لـ 20% بدلاً من 25% لتستوعب 5 أزرار */
+        .nav-item { color: #94a3b8; background: none; border: none; font-size: 0.85rem; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; width: 20%; font-family: inherit; }
+        .nav-item.active { color: #f97316; font-weight: bold; }
+        
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+    <div class="top-bar">
+        <h2>أكاديمية الجيل الجديد</h2>
+        <button class="btn-logout" onclick="logout()">خروج</button>
+    </div>
+
+    <div class="container">
+        
+        <div id="tab-home" class="tab-content active">
+            <div class="profile-section">
+                <div class="avatar-container">
+                    <img id="profileAvatar" src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" class="avatar">
+                    <label for="imageUpload" class="upload-btn">📷</label>
+                    <input type="file" id="imageUpload" accept="image/*">
+                </div>
+                <h3 id="playerName" style="margin: 0; font-size: 1.5rem;"></h3>
+                <span id="playerCode" style="color: #94a3b8; font-family: monospace; margin-top: 5px;"></span>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card"><p>النقاط الإجمالية</p><h3 id="playerPoints">0</h3></div>
+                <div class="stat-card"><p>المركز العام</p><h3 id="playerRank">#--</h3></div>
+            </div>
+
+            <div class="task-box">
+                <h4 style="margin-top: 0; color: #3b82f6;">مهمة اليوم:</h4>
+                <p id="taskText"></p>
+                <button id="taskDoneBtn" class="btn-done" onclick="markTaskDone()">✅ تمت المهمة</button>
+            </div>
+        </div>
+
+        <div id="tab-progress" class="tab-content">
+            <h3 style="color: #f97316;">مؤشر التقدم والمستوى</h3>
+            <div class="progress-box">
+                <p style="margin: 0 0 10px 0;">الهدف القادم: الوصول لـ 100 نقطة</p>
+                <div class="progress-bar-bg">
+                    <div id="progressFill" class="progress-fill"></div>
+                </div>
+                <p id="progressText" style="text-align: left; margin: 10px 0 0 0; color: #94a3b8; font-size: 0.9rem; direction: ltr;"></p>
+            </div>
+        </div>
+
+        <div id="tab-attendance" class="tab-content">
+            <h3 style="color: #f97316;">سجل الحضور والتقييم</h3>
+            <div id="attendanceList" class="history-list"></div>
+        </div>
+
+        <div id="tab-challenge" class="tab-content">
+            <h3 style="color: #f97316;">⚔️ ساحة التحديات والرهانات</h3>
+            
+            <div class="challenge-form">
+                <h4 style="margin: 0; color: #cbd5e1;">إنشاء تحدي جديد للمناورة:</h4>
+                <label style="font-size: 0.85rem; color: #94a3b8;">اختر الخصم:</label>
+                <select id="targetPlayerSelect"></select>
+                
+                <label style="font-size: 0.85rem; color: #94a3b8; margin-top: 10px; display: block;">قيمة رهان النقاط:</label>
+                <input type="number" id="challengePointsInput" placeholder="مثال: 10 أو 50" min="1">
+                
+                <button class="btn-challenge" onclick="createNewChallenge()">🔥 إرسال التحدي رسمياً</button>
+            </div>
+
+            <h4 style="color: #cbd5e1; margin-bottom: 10px;">التحديات القائمة في الأكاديمية:</h4>
+            <div id="activeChallengesList"></div>
+        </div>
+
+        <!-- 5. قسم الغرفة التكتيكية المضاف حديثاً 🧠 -->
+        <div id="tab-tactical" class="tab-content">
+            <h3 style="color: #8b5cf6;">🧠 الغرفة التكتيكية والتحليل الفني</h3>
+            <div id="videoTaskBox" class="progress-box" style="background:#1e293b;">
+                <h4 style="margin:0; color:#fbbf24;">سؤال الكابتن التكتيكي:</h4>
+                <p id="tacticalQuestionText" style="line-height:1.5; color:#e2e8f0; margin-top:5px;"></p>
+                
+                <!-- عرض الفيديو مدمج -->
+                <div id="videoArea" class="video-container" style="display:none;">
+                    <iframe id="tacticalIframe" src="" allowfullscreen></iframe>
+                </div>
+                
+                <h4 style="margin:20px 0 5px 0; color:#8b5cf6;">اكتب إجابتك وتحليلك للقطة:</h4>
+                <textarea id="videoAnswerInput" placeholder="اكتب إجابتك هنا ليراجعها الكوتش..."></textarea>
+                <button id="sendAnswerBtn" class="btn-challenge" style="background-color:#8b5cf6; margin-top:10px;" onclick="submitVideoAnswer()">🚀 إرسال التحليل للكوتش</button>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="bottom-nav">
+        <button class="nav-item active" onclick="switchTab('home', this)">🏠<br>الرئيسية</button>
+        <button class="nav-item" onclick="switchTab('progress', this)">📈<br>التقدم</button>
+        <button class="nav-item" onclick="switchTab('attendance', this)">📋<br>الحضور</button>
+        <button class="nav-item" onclick="switchTab('challenge', this)">⚔️<br>تحدي</button>
+        <!-- الزر الخامس المضاف -->
+        <button class="nav-item" onclick="switchTab('tactical', this)">🧠<br>تكتيك</button>
+    </div>
+
+    <script>
+        const code = localStorage.getItem("currentPlayerCode");
+        let db = JSON.parse(localStorage.getItem("academyDB"));
+        if (!code || !db || !db[code]) { window.location.href = "index.html"; }
+
+        const playerData = db[code];
+
+        document.getElementById("playerName").innerText = playerData.name;
+        document.getElementById("playerCode").innerText = playerData.code;
+        document.getElementById("playerPoints").innerText = playerData.points;
+        if(playerData.image) document.getElementById("profileAvatar").src = playerData.image;
+
+        let playersArray = Object.values(db).sort((a, b) => b.points - a.points);
+        document.getElementById("playerRank").innerText = "#" + (playersArray.findIndex(p => p.code === code) + 1);
+
+        document.getElementById("taskText").innerText = localStorage.getItem("academyTask") || "لا توجد مهام حالياً";
+        let today = new Date().toISOString().split('T')[0];
+        if (playerData.tasksDone && playerData.tasksDone[today]) {
+            let btn = document.getElementById("taskDoneBtn");
+            btn.innerText = "تم الإنجاز اليوم ✅";
+            btn.style.background = "#22c55e";
+            btn.disabled = true;
+        }
+
+        function markTaskDone() {
+            if (!playerData.tasksDone) playerData.tasksDone = {};
+            playerData.tasksDone[today] = true;
+            localStorage.setItem("academyDB", JSON.stringify(db));
+            let btn = document.getElementById("taskDoneBtn");
+            btn.innerText = "تم الإرسال!";
+            btn.style.background = "#22c55e";
+            btn.disabled = true;
+        }
+
+        // تجهيز قائمة اختيار الخصم في التحدي
+        const selectElement = document.getElementById("targetPlayerSelect");
+        Object.keys(db).forEach(pCode => {
+            if(pCode !== code) {
+                selectElement.innerHTML += `<option value="${pCode}">${db[pCode].name}</option>`;
+            }
+        });
+
+        function createNewChallenge() {
+            let targetCode = document.getElementById("targetPlayerSelect").value;
+            let betPoints = parseInt(document.getElementById("challengePointsInput").value);
+            
+            if(!betPoints || betPoints <= 0) { alert("الرجاء إدخال عدد نقاط صحيح!"); return; }
+            if(playerData.points < betPoints) { alert("نقاطك الحالية لا تكفي لهذا الرهان الثقيل!"); return; }
+
+            let challenges = JSON.parse(localStorage.getItem("academyChallenges")) || [];
+            challenges.push({
+                id: Date.now(),
+                fromCode: code,
+                fromName: playerData.name,
+                toCode: targetCode,
+                toName: db[targetCode].name,
+                points: betPoints,
+                status: "Pending"
+            });
+
+            localStorage.setItem("academyChallenges", JSON.stringify(challenges));
+            alert("تم تسجيل التحدي في السيستم! أثبت نفسك في المناورة وبانتظار حكم الكوتش 🤙️");
+            document.getElementById("challengePointsInput").value = "";
+            loadChallenges();
+        }
+
+        function loadChallenges() {
+            const list = document.getElementById("activeChallengesList");
+            list.innerHTML = "";
+            let challenges = JSON.parse(localStorage.getItem("academyChallenges")) || [];
+            
+            if(challenges.length === 0) {
+                list.innerHTML = "<p style='text-align:center; color:#94a3b8;'>لا توجد تحديات معلقة حالياً.</p>";
+                return;
+            }
+
+            challenges.forEach(c => {
+                list.innerHTML += `
+                    <div class="challenge-card">
+                        <div>
+                            <span style="color:#fbbf24; font-weight:bold;">${c.fromName}</span> 
+                            <span style="font-size:0.85rem; color:#94a3b8;">ضد</span> 
+                            <span style="color:#3b82f6; font-weight:bold;">${c.toName}</span>
+                        </div>
+                        <span class="badge-points">⚔️ ${c.points} ن</span>
+                    </div>
+                `;
+            });
+        }
+
+        // === دوال الغرفة التكتيكية المضافة حديثاً ===
+        function getYouTubeId(url) {
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+            const match = url.match(regExp);
+            return (match && match[2].length === 11) ? match[2] : null;
+        }
+
+        function loadTacticalRoom() {
+            let vt = JSON.parse(localStorage.getItem("academyVideoTask"));
+            let box = document.getElementById("videoTaskBox");
+            
+            if (!vt || !vt.url) {
+                box.innerHTML = "<p style='text-align:center; color:#94a3b8; margin:0;'>⏳ لا يوجد تحدي تكتيكي نشط حالياً من الكابتن.</p>";
+                return;
+            }
+
+            document.getElementById("tacticalQuestionText").innerText = vt.question;
+            
+            let videoId = getYouTubeId(vt.url);
+            if (videoId) {
+                document.getElementById("tacticalIframe").src = "https://www.youtube.com/embed/" + videoId;
+                document.getElementById("videoArea").style.display = "block";
+            } else {
+                document.getElementById("videoArea").style.display = "none";
+            }
+
+            document.getElementById("videoAnswerInput").value = playerData.videoAnswer || "";
+            
+            if(playerData.videoAnswer) {
+                let btn = document.getElementById("sendAnswerBtn");
+                btn.innerText = "تحديث التحليل المرسل 🔄";
+                btn.style.backgroundColor = "#22c55e";
+            }
+        }
+
+        function submitVideoAnswer() {
+            let ans = document.getElementById("videoAnswerInput").value.trim();
+            if(!ans) return alert("اكتب إجابتك أولاً يا بطل!");
+
+            // حفظ إجابة اللاعب بالداتا بيس
+            db[code].videoAnswer = ans;
+            localStorage.setItem("academyDB", JSON.stringify(db));
+            
+            let btn = document.getElementById("sendAnswerBtn");
+            btn.innerText = "تم الإرسال بنجاح! ✅";
+            btn.style.backgroundColor = "#22c55e";
+            alert("وصلت إجابتك لغرفة القيادة بسلام! 🧠⚽");
+        }
+        // === نهاية دوال الغرفة التكتيكية ===
+
+        document.getElementById('imageUpload').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                db[code].image = event.target.result;
+                localStorage.setItem("academyDB", JSON.stringify(db));
+                document.getElementById("profileAvatar").src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+
+        function switchTab(tabName, btnElement) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('active'));
+            
+            document.getElementById('tab-' + tabName).classList.add('active');
+            btnElement.classList.add('active');
+
+            if(tabName === 'progress') loadProgress();
+            if(tabName === 'attendance') loadAttendance();
+            if(tabName === 'challenge') loadChallenges();
+            // تشغيل التكتيك إذا تم اختياره
+            if(tabName === 'tactical') loadTacticalRoom(); 
+        }
+
+        function loadProgress() {
+            let points = playerData.points;
+            let target = 100;
+            let percentage = (points / target) * 100;
+            if(percentage > 100) percentage = 100;
+            setTimeout(() => { document.getElementById("progressFill").style.width = percentage + "%"; }, 100);
+            document.getElementById("progressText").innerText = `${points} / ${target}`;
+        }
+
+        function loadAttendance() {
+            const list = document.getElementById("attendanceList");
+            list.innerHTML = "";
+            let historyObj = playerData.history || {};
+            let dates = Object.keys(historyObj).sort((a,b) => new Date(b) - new Date(a));
+            if(dates.length === 0) { list.innerHTML = "<p style='text-align:center; color:#94a3b8;'>لا يوجد سجل متاح حالياً.</p>"; return; }
+            dates.forEach(date => {
+                let record = historyObj[date];
+                let statusHtml = record.att > 0 ? `<span class="status-tag" style="color:#4ade80;">حاضر</span>` : `<span class="status-tag" style="color:#f87171;">غائب</span>`;
+                list.innerHTML += `<div class="history-item"><span>📅 ${date}</span><div>${statusHtml}</div></div>`;
+            });
+        }
+
+        function logout() { localStorage.removeItem("currentPlayerCode"); window.location.href = "index.html"; }
+    </script>
+</body>
+</html>
